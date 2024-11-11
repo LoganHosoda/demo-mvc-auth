@@ -1,0 +1,24 @@
+{
+  "name": "demo-mvc-auth",
+  "version": "1.0.0",
+  "description": "Building out simple fullstack CRUD app with MVC and auth. Demo to solidify learnings",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Logan Hosoda",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "mongo-store": "^0.0.2",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.1",
+    "passport": "^0.7.0",
+    "session": "^0.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
