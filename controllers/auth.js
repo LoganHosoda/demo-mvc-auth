@@ -59,6 +59,7 @@ exports.postLogin = (req, res, next) => {
 // Post signup handler
 exports.postSignup = async (req, res, next) => {
   const validationErrors = [];
+
   if (!validator.isEmail(req.body.email))
     validationErrors.push({ msg: "Please enter a valid email address." });
   if (!validator.isLength(req.body.password, { min: 8 }))
@@ -105,22 +106,21 @@ exports.postSignup = async (req, res, next) => {
 
 // Logout handler
 exports.logout = (req, res) => {
+  console.log("Before logout, session object: ", req.session);
+
   if (!req.session) {
     return res.status(400).send('No session to destroy');
   }
-  req.logout((err) => {
-    if (err) {
-      console.log('Logout error:', err);
-    } else {
-      console.log('User has logged out.');
-    }
-  });
 
+  // Manually destroy session, skipping passport's `req.logout()`
   req.session.destroy((err) => {
     if (err) {
       console.log("Error during session destroy:", err);
+      return res.status(500).send('Failed to destroy session');
     }
-    req.user = null;
-    res.redirect("/");
+
+    req.user = null;  // Clear the user info
+    res.redirect("/");  // Redirect to homepage or login page
   });
 };
+
