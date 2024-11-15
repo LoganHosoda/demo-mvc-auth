@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
 const passport = require('passport');
+const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 const flash = require('express-flash');
 const logger = require('morgan');
-require('./config/passport');
+require('./config/passport')(passport);
 
 // Imported routes
 const homeRoutes = require('./routes/home');
@@ -41,7 +41,10 @@ app.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({ mongoUrl: process.env.DB_URI })
+  store: MongoStore.create({ 
+    client: mongoose.connection.getClient(),
+    dbName: 'test'
+  })
 }))
 
 // Passport middleware

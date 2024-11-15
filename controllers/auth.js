@@ -2,6 +2,7 @@ const passport = require('passport');
 const validator = require('validator');
 const User = require('../models/User');
 
+// Get login page 
 exports.getLogin = (req, res) => {
   if (req.user) {
     return res.redirect('/training');
@@ -11,6 +12,17 @@ exports.getLogin = (req, res) => {
   });
 }
 
+// Get signup up
+exports.getSignup = (req, res) => {
+  if (req.user) {
+    return res.redirect("/training");
+  }
+  res.render("signup", {
+    title: "Create Account",
+  });
+};
+
+// Post login handler
 exports.postLogin = (req, res, next) => {
   const validationErrors = [];
   if (!validator.isEmail(req.body.email))
@@ -39,32 +51,12 @@ exports.postLogin = (req, res, next) => {
         return next(err);
       }
       req.flash("success", { msg: "Success! You are logged in." });
-      res.redirect(req.session.returnTo || "/training");
+      return res.redirect(req.session.returnTo || "/training");
     });
   })(req, res, next);
 };
 
-exports.logout = (req, res) => {
-  req.logout(() => {
-    console.log('User has logged out.')
-  })
-  req.session.destroy((err) => {
-    if (err)
-      console.log("Error : Failed to destroy the session during logout.", err);
-    req.user = null;
-    res.redirect("/");
-  });
-};
-
-exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect("/training");
-  }
-  res.render("signup", {
-    title: "Create Account",
-  });
-};
-
+// Post signup handler
 exports.postSignup = async (req, res, next) => {
   const validationErrors = [];
   if (!validator.isEmail(req.body.email))
@@ -84,51 +76,51 @@ exports.postSignup = async (req, res, next) => {
     gmail_remove_dots: false,
   });
 
-  const user = new User({
-    userName: req.body.userName,
-    email: req.body.email,
-    password: req.body.password,
-  });
+  const { userName, email, password } = req.body;
+  console.log(userName);
+  console.log(email);
+  console.log(password);
 
-  const existingUser = User.findOne({ $or: [{ email: req.body.email }, { userName: req.body.userName }] })
-  if (existingUser.email || existingUser.userName) {
-    console.log(existingUser.email)
-    req.flash("errors", {
-      msg: "Account with that email address or username already exists.",    
-    })
-    return res.redirect('../signup');
-  };
-  await user.save()
-  req.logIn(user, (err) => {
-    if (err) {
-      return next(err);
+  try {
+    const existingUser = await User.findOne({ email }); 
+    if (existingUser) {
+      req.flash('errors', { msg: 'Email is already registered.' });
+      return res.redirect('/signup');
     }
-    res.redirect('/training');
-  })
-  //User.findOne(
-  //  { $or: [{ email: req.body.email }, { userName: req.body.userName }] },
-  //  (err, existingUser) => {
-  //    if (err) {
-  //      return next(err);
-  //    }
-  //    if (existingUser) {
-  //      req.flash("errors", {
-  //        msg: "Account with that email address or username already exists.",
-  //      });
-  //      return res.redirect("../signup");
-  //    }
-  //    user.save((err) => {
-  //      if (err) {
-  //        return next(err);
-  //      }
-  //      req.logIn(user, (err) => {
-  //        if (err) {
-  //          return next(err);
-  //        }
-  //        res.redirect("/training");
-  //      });
-  //    });
-  //  }
-  //);
+
+    const newUser = new User({ userName, email, password });
+    await newUser.save();
+
+    // Log the user in after successful signup
+    req.logIn(newUser, (err) => {
+      if (err) { return next(err) }
+      // Redirect to training page
+      req.flash('success', { msg: 'Account created and logged in!' });
+      return res.redirect('/training');
+    })
+  } catch (err) {
+    next(err); 
+  }
 };
 
+// Logout handler
+exports.logout = (req, res) => {
+  if (!req.session) {
+    return res.status(400).send('No session to destroy');
+  }
+  req.logout((err) => {
+    if (err) {
+      console.log('Logout error:', err);
+    } else {
+      console.log('User has logged out.');
+    }
+  });
+
+  req.session.destroy((err) => {
+    if (err) {
+      console.log("Error during session destroy:", err);
+    }
+    req.user = null;
+    res.redirect("/");
+  });
+};
