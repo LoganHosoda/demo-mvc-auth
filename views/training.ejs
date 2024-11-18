@@ -2,5 +2,21 @@
 
 <h1>This is the training page! You must be logged in to see this!</h1> 
 <a href="/logout">Logout</a>
+<% console.log(training[0]) %>
+<div class="training-container">
+  <% for (let i = 0; i < training.length; i++) { %>
+    <% console.log(training[i]) %>
+    <h4><%= training[i].title %></h4>
+    <p><%= training[i].sop %></p>
+    <p><%= training[i].revision %></p>
+    <p><%= training[i].createdAt %></p>
+  <% } %>
+</div>
+<form action="/training/post" method="POST">
+  <input type="text" id="sop" name="sop" placeholder="Enter the SOP Number">
+  <input type="text" id="title" name="title" placeholder="Enter the Title of this SOP">
+  <input type="text" id="revision" name="revision" placeholder="Enter the Revision of this SOP">
+  <button type="submit">Submit</button>
+</form>
 
 <%- include('partials/footer') -%> 

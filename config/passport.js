@@ -22,13 +22,13 @@ module.exports = function (passport) {
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
       try {
         const user = await User.findOne({ email }); 
-        if (!user) return done(null, false, { message: 'No user with that email.' });
+        if (!user) return done(null, false, { msg: 'No user with that email.' });
 
         const isMatch = await user.comparePassword(password);
         if (isMatch) {
           return done(null, user);
         } else {
-          return done(null, false, { message: 'Incorrect password' });
+          return done(null, false, { msg: 'Incorrect password' });
         }
       } catch (err) {
         return done(err); 

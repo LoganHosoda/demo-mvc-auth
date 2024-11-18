@@ -20,4 +20,4 @@ const TrainingSchema = new mongoose.Schema({
   },
 })
 
-module.exports = ('Training', TrainingSchema);
+module.exports = mongoose.model('Training', TrainingSchema);
