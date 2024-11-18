@@ -3,7 +3,7 @@ const Training = require('../models/Training');
 module.exports = {
   getTraining: async (req, res) => {
     try {
-      const training = Training.find().lean();
+      const training = await Training.find().lean();
       res.render('training.ejs', { training: training });
     } catch (err) {
       console.log(err); 
@@ -20,6 +20,16 @@ module.exports = {
       res.redirect('/training');
     } catch (err) {
       console.log(err) 
+    }
+  },
+  deleteTraining: async (req, res) => {
+    try {
+      console.log(req.params.id)
+      await Training.findByIdAndDelete({ _id: req.params.id })
+      console.log("Successfully deleted SOP")
+      res.redirect('/training');
+    } catch (err) {
+      console.log(err); 
     }
   }
 }

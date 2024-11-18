@@ -2,14 +2,19 @@
 
 <h1>This is the training page! You must be logged in to see this!</h1> 
 <a href="/logout">Logout</a>
-<% console.log(training[0]) %>
 <div class="training-container">
   <% for (let i = 0; i < training.length; i++) { %>
-    <% console.log(training[i]) %>
-    <h4><%= training[i].title %></h4>
-    <p><%= training[i].sop %></p>
-    <p><%= training[i].revision %></p>
-    <p><%= training[i].createdAt %></p>
+    <h4>SOP Title: <%= training[i].title %></h4>
+    <p>SOP Number: <%= training[i].sop %></p>
+    <p>Revision: <%= training[i].revision %></p>
+    <p>Date Created: <%= training[i].createdAt %></p>
+    <form 
+      action="/training/deleteTraining/<%= training[i]._id %>?_method=DELETE"
+      method="POST"
+      class="col-3"
+    >
+      <button class="btn btn-primary fa fa-trash" type="submit"></button>
+    </form>
   <% } %>
 </div>
 <form action="/training/post" method="POST">
